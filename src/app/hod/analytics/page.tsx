@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 
 export default function HODAnalytics() {
-  const [stats, setStats] = useState([]);
+  const [stats, setStats] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

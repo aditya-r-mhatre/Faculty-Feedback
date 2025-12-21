@@ -4,7 +4,7 @@ import { useSession } from "next-auth/react";
 
 export default function StudentDashboard() {
   const { data: session, status } = useSession();
-  const [forms, setForms] = useState([]);
+  const [forms, setForms] = useState<any[]>([]);
   const [selectedForm, setSelectedForm] = useState<any>(null);
   const [ratings, setRatings] = useState<any>({});
   const [comment, setComment] = useState(""); // State for optional comments
@@ -125,7 +125,7 @@ export default function StudentDashboard() {
                       onChange={(e) => setRatings({...ratings, [index]: parseInt(e.target.value)})}
                     />
                     <span className="text-xs text-gray-400">5</span>
-                    <div className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-md font-bold text-sm min-w-[32px] text-center">
+                    <div className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded-md font-bold text-sm min-w-8 text-center">
                       {ratings[index] || 3}
                     </div>
                   </div>
