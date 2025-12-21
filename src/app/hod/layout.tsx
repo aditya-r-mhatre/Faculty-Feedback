@@ -1,0 +1,20 @@
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth-options";
+import { redirect } from "next/navigation";
+
+export default async function HODLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session || session.user.role !== "HOD") {
+    redirect("/login");
+  }
+
+  return (
+    <div className="min-h-screen bg-slate-50">
+      <nav className="bg-indigo-700 text-white p-4 shadow-md">
+        <h1 className="text-xl font-bold">HOD Analytics Portal</h1>
+      </nav>
+      <main className="p-6">{children}</main>
+    </div>
+  );
+}
