@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
-
+import LogoutButton from "@/components/LogoutButton";
 export default async function StudentLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
 
@@ -11,9 +11,14 @@ export default async function StudentLayout({ children }: { children: React.Reac
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <nav className="bg-emerald-600 text-white p-4 flex justify-between">
-        <span className="font-bold">Student Feedback Portal</span>
-        <span>{session.user.username} (Div {session.user.division})</span>
+      <nav className="bg-emerald-600 text-white p-4 flex justify-between items-center">
+        <div>
+          <span className="font-bold">Student Feedback Portal</span>
+          <span className="ml-4">{session.user.username} (Div {session.user.division})</span>
+        </div>
+        <div>
+          <LogoutButton />
+        </div>
       </nav>
       <main className="p-4 md:p-8">{children}</main>
     </div>

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 export default function SetupSubject() {
   const [data, setData] = useState({ depts: [], faculty: [], programs: [] });
   const [availableYears, setAvailableYears] = useState<string[]>([]);
@@ -13,7 +13,7 @@ export default function SetupSubject() {
     batch: "",    // Added
     facultyId: ""
   });
-
+  const router = useRouter();
   useEffect(() => {
     const loadInitialData = async () => {
       const [deptRes, facRes] = await Promise.all([
@@ -53,6 +53,7 @@ export default function SetupSubject() {
       alert("Subject and Faculty Assignment Saved!");
       // Optional: Reset small parts of form
       setFormData({ ...formData, name: "", division: "", batch: "" });
+      router.push("/admin/dashboard");
     }
   };
 

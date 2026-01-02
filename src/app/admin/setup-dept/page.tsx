@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 export default function SetupDept() {
   const [name, setName] = useState("");
   const [hodUsername, setHodUsername] = useState("");
+  
+  const router = useRouter();
 
   const handleCreateDept = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -12,15 +14,18 @@ export default function SetupDept() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, hodUsername }),
     });
-    if (res.ok) alert("Department created and HOD linked!");
+    if (res.ok) {
+      alert("Department created and HOD linked!");
+      router.push("/admin/dashboard");
+    }
   };
 
   return (
     <div className="max-w-md mx-auto bg-white p-8 rounded shadow-lg border-t-4 border-indigo-600">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Department Management</h2>
+      <h2 className="text-2xl font-bold mb-6 text-black">Department Management</h2>
       <form onSubmit={handleCreateDept} className="space-y-6">
         <div>
-          <label className="block text-sm font-semibold mb-1">Department Name</label>
+          <label className="block text-sm font-semibold mb-1 text-black">Department Name</label>
           <input 
             type="text" required className="w-full border p-2 rounded"
             placeholder="e.g. Computer Engineering"
@@ -29,7 +34,7 @@ export default function SetupDept() {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold mb-1">Assign HOD (By Username)</label>
+          <label className="block text-sm font-semibold mb-1 text-black">Assign HOD (By Username)</label>
           <input 
             type="text" required className="w-full border p-2 rounded"
             placeholder="Enter the HOD's username"

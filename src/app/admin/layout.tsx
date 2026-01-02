@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth-options";
 import { redirect } from "next/navigation";
 import React from "react";
+import LogoutButton from "@/components/LogoutButton";
 
 export default async function AdminLayout({
   children,
@@ -16,9 +17,19 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      {/* Sidebar can be added here */}
-      <main className="flex-1 p-8">{children}</main>
+    <div className="min-h-screen bg-gray-100">
+      {/* Top Header Bar */}
+      <header className="w-full bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
+        <h1 className="text-xl font-semibold">
+          Admin Dashboard
+        </h1>
+        <LogoutButton />
+      </header>
+
+      {/* Page Content */}
+      <main className="p-8">
+        {children}
+      </main>
     </div>
   );
 }

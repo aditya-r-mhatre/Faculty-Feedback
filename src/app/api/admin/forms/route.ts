@@ -16,6 +16,7 @@ export async function POST(req: Request) {
       subjectId, 
       division, // Added
       batch,    // Added
+      facultyId,
       questions 
     } = body;
 
@@ -24,9 +25,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Division is required for targeting students." }, { status: 400 });
     }
 
+    if (!facultyId) {
+      return NextResponse.json({ error: "facultyId is required - please select the faculty teaching this subject." }, { status: 400 });
+    }
+
     if (!questions || questions.length === 0) {
       return NextResponse.json({ error: "At least one question is required." }, { status: 400 });
     }
+
+    // Fetch faculty to store name (for easy display in analytics)
+    const User = (await import('@/models/User')).default;
+    const facultyUser = facultyId ? await User.findById(facultyId).select('username') : null;
 
     const newForm = await FeedbackForm.create({
       title,
@@ -36,7 +45,9 @@ export async function POST(req: Request) {
       subjectId,
       division: division.toUpperCase(), // Normalize to uppercase
       batch: batch ? batch.toUpperCase() : null, // Optional field
-      questions
+      questions,
+      facultyId: facultyId || null,
+      facultyName: facultyUser?.username || undefined
     });
 
     return NextResponse.json(newForm, { status: 201 });

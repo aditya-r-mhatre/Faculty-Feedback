@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SetupUsers() {
   const [data, setData] = useState({ depts: [], programs: [] });
@@ -15,6 +16,8 @@ export default function SetupUsers() {
     division: "",
     batch: ""
   });
+
+  const router = useRouter();
 
   // 1. Load Initial Departments
   useEffect(() => {
@@ -48,7 +51,10 @@ export default function SetupUsers() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...formData, role }),
     });
-    if (res.ok) alert("Account Created Successfully!");
+    if (res.ok) {
+      alert("Account Created Successfully!");
+      router.push("/admin/dashboard");
+    }
   };
 
   return (

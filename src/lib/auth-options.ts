@@ -39,6 +39,7 @@ export const authOptions: NextAuthOptions = {
           id: user._id.toString(),
           username: user.username,
           role: user.role,
+          rollNo: user.rollNo,          // 🔥 ADD THIS
           deptId: user.deptId?.toString(),
           division: user.division, // For Student filtering
           batch: user.batch,       // For Student filtering
@@ -48,31 +49,55 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    // Transfers user data from authorize() to the JWT token
     async jwt({ token, user }) {
+      await connectDB();
+
+      // Initial login
       if (user) {
         token.id = user.id;
+        token.username = user.username;
+        token.rollNo = user.rollNo;
         token.role = user.role;
         token.deptId = user.deptId;
         token.division = user.division;
         token.batch = user.batch;
-        token.academicYear = user.academicYear; // persist academicYear into token
+        token.academicYear = user.academicYear;
+        return token;
       }
+
+      // 🔥 IMPORTANT: Refresh token data from DB on every session update
+      if (token?.id) {
+        const dbUser = await User.findById(token.id).lean();
+
+        if (dbUser) {
+          token.username = dbUser.username;
+          token.rollNo = dbUser.rollNo;
+          token.role = dbUser.role;
+          token.deptId = dbUser.deptId?.toString();
+          token.division = dbUser.division;
+          token.batch = dbUser.batch;
+          token.academicYear = dbUser.academicYear;
+        }
+      }
+
       return token;
     },
-    // Makes the JWT data available in the client-side/server-side session
+
     async session({ session, token }) {
-      if (token && session.user) {
+      if (session.user) {
         session.user.id = token.id as string;
+        session.user.username = token.username as string;
+        session.user.rollNo = token.rollNo as string;
         session.user.role = token.role as string;
         session.user.deptId = token.deptId as string;
         session.user.division = token.division as string;
         session.user.batch = token.batch as string;
-        session.user.academicYear = token.academicYear as string; // expose academicYear on session.user
+        session.user.academicYear = token.academicYear as string;
       }
       return session;
     },
   },
+
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",

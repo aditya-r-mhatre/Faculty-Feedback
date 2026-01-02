@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-
+import { useRouter } from "next/navigation";
 export default function ManageForms() {
   const [data, setData] = useState({ depts: [], programs: [], subjects: [] });
   const [availableYears, setAvailableYears] = useState<string[]>([]);
@@ -12,17 +12,25 @@ export default function ManageForms() {
     academicYear: "", 
     subjectId: "",
     division: "", // Added for targeted targeting
-    batch: ""     // Added for optional batch targeting
+    batch: "",     // Added for optional batch targeting
+    facultyId: ""
   });
+
+  const [facultyList, setFacultyList] = useState<any[]>([]);
 
   const [title, setTitle] = useState("");
   const [questions, setQuestions] = useState([{ questionText: "", type: "rating" }]);
-
+  const router = useRouter();
   useEffect(() => {
     fetch("/api/admin/dept")
       .then(res => res.json())
       .then(depts => setData(prev => ({ ...prev, depts })))
       .catch(() => console.error("Failed to load departments"));
+    // load faculty list for selector
+    fetch('/api/admin/users?role=FACULTY')
+      .then(res => res.json())
+      .then(list => setFacultyList(list || []))
+      .catch(() => console.error('Failed to load faculty list'));
   }, []);
 
   useEffect(() => {
@@ -62,9 +70,9 @@ export default function ManageForms() {
   };
 
   const handleSaveForm = async () => {
-    // Basic validation: Division is now mandatory for targeting
-    if (!title || !selections.subjectId || !selections.division || questions.some(q => !q.questionText)) {
-      alert("Please complete all selections, including Division, and fill all questions.");
+    // Basic validation: Division and Faculty are now mandatory for targeting
+    if (!title || !selections.subjectId || !selections.division || !selections.facultyId || questions.some(q => !q.questionText)) {
+      alert("Please complete all selections, including Division and Faculty, and fill all questions.");
       return;
     }
 
@@ -82,7 +90,8 @@ export default function ManageForms() {
       alert("Feedback Form Published Successfully!");
       setTitle("");
       setQuestions([{ questionText: "", type: "rating" }]);
-      setSelections({...selections, division: "", batch: ""});
+      setSelections({...selections, division: "", batch: "", facultyId: ""});
+      router.push("/admin/dashboard");
     }
   };
 
@@ -129,6 +138,18 @@ export default function ManageForms() {
         >
           <option value="">Select Subject</option>
           {data.subjects.map((s: any) => <option key={s._id} value={s._id}>{s.name}</option>)}
+        </select>
+
+        {/* Faculty Selector */}
+        <select
+          className="p-3 border rounded-lg bg-white text-sm disabled:opacity-50"
+          value={selections.facultyId}
+          onChange={(e) => setSelections({...selections, facultyId: e.target.value})}
+        >
+          <option value="">Select Faculty</option>
+          {facultyList.map((f: any) => (
+            <option key={f._id} value={f._id}>{f.username}</option>
+          ))}
         </select>
 
         {/* Division Input */}
